@@ -1,0 +1,9 @@
+up route add -net 172.30.12.0 netmask 255.255.255.0 gw 172.31.14.1 dev ens192
+down route del -net 172.30.12.0 netmask 255.255.255.0 gw 172.31.14.1 dev ens192
+up route and -net 172.30.192.0 netmask 255.255.255.0 gw 172.31.14.1 dev ens192
+up route and -net 172.30.110.0 netmask 255.255.255.0 gw 172.31.14.1 dev ens192
+down route del -net 172.30.110.0 netmask 255.255.255.0 gw 172.31.14.1 dev ens192
+up route and -net 42.119.16.128 netmask 255.255.255.224 gw 172.31.14.1 dev ens192
+
+
+dns-nameservers 172.31.14.1 210.245.31.145 21.245.31.136

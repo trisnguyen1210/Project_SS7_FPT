@@ -1,0 +1,661 @@
+* 108x
+
+ * Export ra file txt ten 108x
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong from [PgwBilling].[dbo].[022023] where (bnum like '1%' or bnum in ('0838258501','0838355555','0838222000','0838164001' , '02838258501','02838355555','02838222000','02838164001') or bnum in ('038258501','038355555','038222000','038164001')or bnum like '8011%' or bnum like '048011%'  or bnum like '0248011%' or bnum like '0288011%' or bnum like '088011%'or bnum like '08011%' or bnum like '028800%' or bnum like '024800%' ) and bnum not like '1[89]00%' and mangxp like 'FPT%' and bnum not like '17%'
+
+ * Xu ly tren foxpro
+select bnum,right(alltrim(mangxp),3) trnk,sum(ceil(val(duration1)/60)) from 108x group by bnum,trnk
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+* VNM
+ * Export ra file txt ten vnm
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%VNM%'
+
+ * Xu ly tren foxpro
+select 'VNM den FPT-Tructiep' CT,ceil(sum(val(duration1)/60)) LL from vnm where mangxp like '%HTC%' and (mangkc like '%FPTHNI' or mangkc like '%FPTDNG' or mangkc like '%FPTHCM')
+
+select 'VNM den FPT-Toll' CT ,ceil(sum(val(duration1)/60)) LL from vnm where mangxp like '%HTC%' and mangkc not like '%FPTHNI' and mangkc not like '%FPTDNG' and mangkc not like '%FPTHCM' and mangkc not like 'DV%'
+
+select 'FPT den VNM' CT ,ceil(sum(val(duration1)/60)) LL from vnm where mangxp like 'FPT%' and mangkc like 'HTCMOBI'
+
+(Stop) select 'QTEFPT den VNM' CT,ceil(sum(val(duration1)/60)) LL from vnm where mangxp like 'QTE' and mangkc like 'HTCMOBI'
+
+  ** San luong dich vu 19006
+select gia, sum(ceil((VAL(duration1)-10)/60)) from vnm where mangxp like 'HTCMOBI' and bnum like '19006%' and val(duration1)>=10 group by gia
+
+  ** San luong dich vu 18006
+select sum(ceil((VAL(duration1))/60)) from vnm where mangxp like 'HTCMOBI' and bnum like '18006%'
+
+
+  ** San luong dich vu 19004 (Stop)
+select gia, sum(ceil((VAL(duration1)-10)/60)) from vnm where bnum like '19004%' and val(duration1)>=10 group by gia
+
+  ** San luong dich vu 18004 (Stop)
+select sum(ceil((VAL(duration1))/60)) from vnm where bnum like '18004%'
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+* Gtel_DD
+ * Export ra file txt ten gtel
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[022023] where nap like '%GTL%' and nap not like 'sip_gtl_1988'
+
+ * Xu ly tren foxpro
+
+select 'GTL den FPT-Tructiep' CT,ceil(sum(val(duration1)/60)) LL from gtel where mangxp like '%GTL%' and (mangkc like '%FPTHNI' or mangkc like '%FPTDNG' or mangkc like '%FPTHCM')
+
+select 'GTL den FPT-Toll' CT ,ceil(sum(val(duration1)/60)) LL from gtel where mangxp like 'GTL%' and mangkc not like '%FPTHNI' and mangkc not like '%FPTDNG' and mangkc not like '%FPTHCM' and mangkc not like 'DV%'
+
+select 'FPT den GTL' CT ,ceil(sum(val(duration1)/60)) LL from gtel where mangxp like 'FPT%' and mangkc like 'GTLMOBI'
+
+select 'QTEFPT den GTL' CT,ceil(sum(val(duration1)/60)) LL from gtel where mangxp like 'QTE' and mangkc like 'GTLMOBI'
+
+
+
+* Gtel_CD
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like 'sip_gtl_1988'
+
+* Xu ly tren foxpro
+select gia,sum(ceil((VAL(duration1)-10)/60)) from gtel_cd WHERE bnum like '19006%' and val(duration1)>=10 group by gia
+select sum(ceil((VAL(duration1))/60)) SL1800 from gtel_cd where bnum like '18006%'
+
+Chiều CĐ Gtel đến CĐ FPT (noi hat)
+select ceil(sum(val(duration1)/60)) from gtel_cd WHERE dichvu like 'noihat' AND mangkc like 'FPT%'
+
+Chiều CĐ Gtel đến CĐ FPT có mã vùng (liên tỉnh)
+select ceil(sum(val(duration1)/60)) from gtel_cd WHERE dichvu like 'lientinhden' AND mangkc in ('FPTHCM','FPTHNI','FPTDNG')
+
+Chiều CĐ Gtel đến CĐ FPT không có mã vùng (liên tỉnh)	
+select ceil(sum(val(duration1)/60)) from gtel_cd WHERE dichvu like 'lientinhden' AND mangkc NOT in ('FPTHCM','FPTHNI','FPTDNG')
+
+Chiều CĐ FPT đến CĐ noi hat Gtel
+select ceil(sum(val(duration1)/60)) from gtel_cd WHERE doituong like 'CD FPT' AND dichvu like 'noihat' AND mangkc in ('HCM','HNI','DNG')
+
+Chiều CĐ FPT đến CĐ liên tỉnh Gtel	
+select ceil(sum(val(duration1)/60)) from gtel_cd WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc in ('HCM','HNI','DNG')
+
+
+* GTEL dich vu 19000 (18001900 den GTEL) (Huy)
+
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where called like '1[8|9]000%' and nap like 'sip_gtl_1988'
+
+  ** Luu luong dich vu 18006
+select 'GTel den 1800 FPT',ceil(sum(val(duration1)/60)) LL from gtel where mangxp like 'GTLMOBI'  and bnum like '18006%'
+ 
+ ** San luong dich vu 19006
+select gia,sum(ceil((VAL(duration1)-10)/60)) from gtel where mangxp like 'GTLMOBI' and bnum like '19006%'  and val(duration1)>=10 group by gia
+
+* Xu ly tren foxpro
+
+** 1900 GTEL
+select 'GTel den 1800 FPT',SUM(ceil(val(duration)/60)) LL from gtel_dv where bnum like '18000%' and val(duration)>=3
+
+select gia,sum(ceil((VAL(duration1)-10)/60)) from gtel_dv where (mangxp <>'QTE' and mangxp not like '%QTV%') and bnum like '19000%'  and val(duration1)>=10 group by gia
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+* Viettel
+
+	***Export
+select distinct anum,bnum,conntime,duration,duration1,duration2,durationms,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%VTL%' and doituong like '%CD%'
+select distinct anum,bnum,conntime,duration,duration1,duration2,durationms,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%VTL%' and doituong like '%DD%'
+select distinct anum,bnum,conntime,duration,duration1,duration2,durationms,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%VTL%' and (mangxp like 'QTE' or mangxp like '%QTV%') AND mangkc NOT like 'DV%' and mangkc like 'FPT%'
+
+
+** Co dinh FPT goi di dong Viettel
+select ceil(sum(val(duration1)/60)) from vtl_cd where mangxp like 'FPT%' AND dichvu like 'didong%'
+
+** Lien tinh 168/178 den co dinh FPT
+select ceil(sum(val(duration1)/60)) from vtl_cd where doituong like 'CD VTL' AND dichvu like 'lientinh%' AND mangxp not like '%QTV%'
+
+
+ ** Di dong Viettel goi co dinh FPT + Truc tiep
+select ceil(sum(val(duration1)/60)) from vtl_dd where mangxp like 'VTLMOBI' AND dichvu like 'didong%' AND mangxp not like '%QTV%'
+ 
+ 
+  ** Tai nhung noi co POP, lientinhdi, G
+SELECT ceil(sum(val(duration1)/60)) FROM vtl_cd WHERE dichvu like 'lientinhdi'
+SELECT CEIL(SUM(VAL(duration1)/60)) FROM vtl_cd WHERE dichvu like 'lientinh' and mangxp like 'FPT%' AND mangkc NOT like 'FPT%'
+
+[-----------------------------------------------]  
+
+**** Dich vu quoc te chieu ve (168 / 178)
+select ceil(sum(val(duration1)/60)) from vtl_qt where (mangxp like 'QTE' or mangxp like '%QTV%') AND mangkc NOT like 'DV%' and mangkc like 'FPT%'
+[---------------------------------------------------]
+ 
+**san luong dich vu 106x cua Viettel
+select bnum,sum(ceil((val(duration1)-10)/60)) LL from vtl_cd where bnum like '028106%' OR bnum like '024106%'  group by bnum
+
+select bnum,sum(ceil((val(duration1)-10)/60)) LL from vtl_cd where bnum like '024106%'  group by bnum
+select bnum,sum(ceil((val(duration1)-10)/60)) LL from vtl_cd where bnum like '028106%'  group by bnum
+
+ ** san luong dichvu 1900vtl (FPT su dung 19008/9 cua Viettel )
+(Solution 1)select dai,gia,sum(ceil((val(duration1)-10)/60)) sum_cd from vtl_cd where mangkc like 'DV1900' AND (bnum like '19008%' or bnum like '19009%') and not bnum like '19009095%' AND mangxp NOT like 'QTE' group by dai,gia
+(Solution 2)select dai,gia,sum(ceil((val(duration1)-10)/60)) sum_cd from vtl_cd where mangkc like 'DV1900' AND (bnum like '19008%' or bnum like '19009%') AND mangxp NOT like 'QTE' group by dai,gia
+ 
+  ** san luong dichvu 1800vtl (FPT gọi 1800xxxx của VTL)
+select sum(ceil((val(duration1))/60)) from vtl_cd where mangkc like 'DV1800' AND (bnum like '18008%' or bnum like '18009%') and (bnum not like '18008098' and bnum not like '18008119' and bnum not like  '18008198' and bnum not like '18008000') AND mangxp NOT like 'QTE' and val(duration1) >= 3
+
+  ** san luong dichvu 1900fpt ( Viettel su dung 19006xxxx cua FPT)
+select dai,gia,doituong,sum(ceil((VAL(duration1)-10)/60)) codinh from vtl_cd where  bnum like '19006%' and VAL(duration1)>=10 and (mangxp <>'QTE' and mangxp not like '%QTV%') group by dai,gia,doituong
+select dai,gia,doituong,sum(ceil((VAL(duration1)-10)/60)) didong from vtl_dd where  bnum like '19006%' and VAL(duration1)>=10 and (mangxp <>'QTE' and mangxp not like '%QTV%') group by dai,gia,doituong
+
+** san luong dichvu 1800fpt (VTL su dung 1800xxxx cua FPT)
+select doituong,sum(ceil((val(duration1))/60)) codinh from vtl_cd where bnum like '18006%' AND bnum <> '18006099' and (mangxp NOT like 'QTE' and mangxp not like '%QTV%') and val(duration1) >= 3 group by doituong
+select doituong,sum(ceil((val(duration1))/60)) didong from vtl_dd where bnum like '18006%' AND bnum <> '18006099' and (mangxp NOT like 'QTE' and mangxp not like '%QTV%') and val(duration1) >= 3 group by doituong
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+* SPT
+ * Export ra file txt ten spt
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%SPT%'
+
+ * Xu ly tren foxpro
+
+  ** Lien tinh den co dinh SPT
+select ceil(sum(val(duration1)/60)) from spt where  doituong like 'CD FPT' and (mangxp not like 'QTE' and mangxp not like '%HCM' and mangkc not like 'DV%')
+
+  ** SPT goi lien tinh den FPT
+select ceil(sum(val(duration1)/60)) from spt where  doituong like 'CD SPT' and (mangxp not like 'QTE') and dichvu like 'lientinh%'
+
+  ** San luong SPT goi 19006
+select gia,sum(ceil((VAL(duration1)-10)/60)) from spt where doituong like 'CD SPT' and bnum like '19006%' and val(duration1)>=10 group by gia
+
+  ** Luuluong SPT goi 18006
+select ceil(sum((val(duration1))/60)) LL1800 from spt where doituong like 'CD SPT' and bnum like '18006%'
+
+  ** Luuluong SPT goi 19006
+select ceil(sum((val(duration1)-10)/60)) LL1900 from spt where doituong like 'CD SPT' and bnum like '19006%'
+
+  ** Luuluong FPT goi 18007
+select ceil(sum(((val(duration1)))/60)) LL1800 from spt where bnum like '18007%'
+
+  ** Luuluong FPT goi 19007
+select ceil(sum(((val(duration1)-10))/60)) LL1900 from spt where bnum like '19007%'
+
+  ** San luong FPT goi 19007
+	
+alter table spt add column daiso var(35)
+update spt set daiso = '1.7070-79_779900-49_789900-789919_799900-799919' where bnum between '19007070' and '19007079'
+update spt set daiso = '1.7070-79_779900-49_789900-789919_799900-799919' where bnum between '1900779900' and '1900779949'
+update spt set daiso = '1.7070-79_779900-49_789900-789919_799900-799919' where bnum between '1900789900' and '1900789919'
+update spt set daiso = '2.7000-69_7080-99' where bnum between '19007000' and '19007069'
+update spt set daiso = '2.7000-69_7080-99' where bnum between '19007080' and '19007099'
+update spt set daiso = '3.7100-99' where bnum between '19007100' and '19007199'
+update spt set daiso = '4.7200-99' where bnum between '19007200' and '19007299'
+update spt set daiso = '5.757500-99' where bnum between '1900757500' and '1900757599'
+update spt set daiso = '6.789900-99_779950-99_799900-99' where bnum between '1900779950' and '1900779959'
+update spt set daiso = '6.789900-99_779950-99_799900-99' where bnum between '1900779970' and '1900779999'
+update spt set daiso = '6.789900-99_779950-99_799900-99' where bnum between '1900789920' and '1900789999'
+update spt set daiso = '6.789900-99_779950-99_799900-99' where bnum between '1900799920' and '1900799999'
+update spt set daiso = '7.779960-69' where bnum between '1900779960' and '1900779969'
+select daiso,sum(ceil((VAL(duration1)-10)/60)) from spt where bnum like '19007%' and val(duration1)>=10 group by daiso
+
+#select daiso,sum(ceil((VAL(duration1)-10)/60)) from spt where bnum like '18007%' and val(duration1)>=10 group by daiso
+
+  ** Cuoc dv lien tinh SPT-FPT
+
+select * from spt where doituong like 'CD SPT' and dichvu='lientinhden'
+copy to ct_lientinhden_spt
+alter table ct_lientinhden_spt add column block6s number(10)
+alter table ct_lientinhden_spt add column block1s number(10)
+close table
+use ct_lientinhden_spt
+repl all block6s with 1 for val(duration1)>6
+repl all block1s with 0 for val(duration1)<=6
+repl all block1s with val(duration1)-6 for val(duration1)>6
+
+SELECT 'Block6s',SUM(block6s) FROM ct_lientinhden_spt
+SELECT 'Block1s',SUM(block1s) FROM ct_lientinhden_spt
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+* VMS (MobiFone)
+ * Export ra file txt ten vms
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%vms%'
+ * Xu ly tren foxpro
+  ** San luong VMS goi 19006
+select gia, sum(ceil((VAL(duration1)-10)/60)) from vms where mangxp like 'VMS%' and val(duration1)>=10 and bnum like '1900%' group by gia
+  ** San luong VMS goi 18006
+select gia,sum(ceil((val(duration1))/60)) from vms where mangxp like 'VMS%' and val(duration1)>0 and bnum like '1800%' AND bnum <> '18006099' group by gia
+
+  ** CD FPT goi DD VMS
+select ceil(sum(val(duration1)/60)) from vms where dichvu like 'didongdi' and bnum not like '1[89]%'
+
+  ** DD VMS goi CD FPT
+select ceil(sum(val(duration1)/60)) from vms where dichvu like 'didongden' and bnum not like '1[89]%'
+
+	*** QTV MBF:
+select * from qte where (mangxp like 'QTE' or mangxp like '%QTV%') AND mangkc NOT like 'DV%' and mangkc like 'FPT%'
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+* CMC
+ * Export ra file txt ten cmc
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%CMC%'
+
+ * Xu ly tren foxpro
+   ** San luong CMC goi 19006 (file CD_1900_FPT)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from cmc WHERE bnum like '19006%' and val(duration1)>=10 group by gia
+
+   ** San luong CMC goi 18006 (file CD_1900_FPT)
+select sum(ceil((VAL(duration1))/60)) SL1800 from CMC where bnum like '18006%'
+
+  ** San luong FPT goi 19002
+alter table CMC add column daiso var(35)
+update CMC set daiso = '1.19002000 - 19002099' where bnum between '19002000' and '19002099'
+update CMC set daiso = '2.1900232300 - 1900232399' where bnum between '1900232300' and '1900232399'
+update CMC set daiso = '3.1900232400 - 1900232499' where bnum between '1900232400' and '1900232499'
+update CMC set daiso = '4.1900234500 - 1900234599' where bnum between '1900234500' and '1900234599'
+update CMC set daiso = '5.19002100 - 19002149' where bnum between '19002100' and '19002149'
+update CMC set daiso = '6.19002150 - 19002199' where bnum between '19002150' and '19002199'
+update CMC set daiso = '7.19002200 - 19002249' where bnum between '19002200' and '19002249'
+update CMC set daiso = '8.19002250 - 19002299' where bnum between '19002250' and '19002299'
+
+select daiso,sum(ceil((VAL(duration1)-10)/60)) from CMC where bnum like '19002%' and val(duration1)>=10 group by daiso
+
+   ** San luong CMC goi 18002 (file CD_1900_FPT)
+select sum(ceil((VAL(duration1))/60)) SL1800 from CMC where bnum like '18002%'
+
+  ** CD CMC goi den CD FPT (file KN_CMC-FPT)
+
+• CD CMC gọi đến CD FPT
+ Đến Thuê bao FPT tại HNI, HCM, DNG:
+select ceil(sum(val(duration1)/60)) from cmc WHERE doituong like 'CD CMC' AND dichvu like 'lientinhden' AND mangkc in ('FPTHCM','FPTHNI','FPTDNG')
+
+ Đến Thuê bao  tại các tỉnh còn lại:
+select ceil(sum(val(duration1)/60)) from cmc WHERE doituong like 'CD CMC' AND dichvu like 'lientinhden' AND mangkc NOT in ('FPTHCM','FPTHNI','FPTDNG')
+
+• CD FPT gọi đến CD CMC
+ Đến Thuê bao CMC tại HNI, HCM, DNG:
+select ceil(sum(val(duration1)/60)) from cmc WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc in ('HCM','HNI','DNG')
+
+ Đến Thuê bao CMC tại các tỉnh còn lại:
+select ceil(sum(val(duration1)/60)) from cmc WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc not in ('HCM','HNI','DNG')
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+* ITEL
+ * Export ra file txt ten itel
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%ITEL%' and nap not like '%DIGITEL%'
+
+ * Xu ly tren foxpro
+   ** San luong ITEL goi 19006 (file CD_1900_FPT)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from itel WHERE bnum like '19006%' and val(duration1)>=10 group by gia
+select anum,bnum,conntime,duration1,mangxp,mangkc from itel WHERE bnum like '19006%' 
+
+   ** San luong ITEL goi 18006 (file CD_1900_FPT)
+select sum(ceil((VAL(duration1))/60)) SL1800 from ITEL where bnum like '18006%' and bnum not like '18006099'
+select anum,bnum,conntime,duration1,mangxp,mangkc,gia from itel WHERE bnum like '19006%' AND anum like '%777%'
+
+  ** San luong FPT goi 19002
+alter table ITEL add column daiso var(50)
+update ITEL set daiso = '1.19002600 - 19002699 - 909' where bnum between '19002600' and '19002699'
+update ITEL set daiso = '2.19002800 - 19002849 - 909' where bnum between '19002800' and '19002849'
+update ITEL set daiso = '3.19002850 - 19002869 - 1818' where bnum between '19002850' and '19002869'
+update ITEL set daiso = '4.19002870 - 19002885 - 909' where bnum between '19002870' and '19002885'
+update ITEL set daiso = '5.19002886 - 19002899 - 7273' where bnum between '19002886' and '19002899'
+update ITEL set daiso = '6.1900292900 - 1900292914 - 7273' where bnum between '1900292900' and '1900292914'
+update ITEL set daiso = '7.1900292915 - 1900292999 - 909' where bnum between '1900292915' and '1900292999'
+update ITEL set daiso = '8.1900299900 - 1900299999 - 909' where bnum between '1900299900' and '1900299999'
+update ITEL set daiso = '9.1900252500 - 1900252514 - 7273' where bnum between '1900252500' and '1900252514'
+update ITEL set daiso = '10.1900252515 - 1900252599 - 909' where bnum between '1900252515' and '1900252599'
+update ITEL set daiso = '11.1900272700 - 1900272799 - 909' where bnum between '1900272700' and '1900272799'
+update ITEL set daiso = '12.1900277200 - 1900277299 - 909' where bnum between '1900277200' and '1900277299'
+update ITEL set daiso = '13.1900299200 - 1900299299 - 909' where bnum between '1900299200' and '1900299299'
+
+SELECT sum(ceil((VAL(duration1)-10)/60)) FROM ITEL WHERE bnum BETWEEN '1900299200' AND '1900299209' (Giá của 4545)
+
+select daiso,sum(ceil((VAL(duration1)-10)/60)) from ITEL where bnum like '19002%' and val(duration1)>=10 group by daiso
+
+  ** CD ITEL goi den CD FPT (file KN_ITEL-FPT)
+
+• CD ITEL gọi đến CD FPT
+ Đến Thuê bao FPT tại HNI, HCM, DNG:
+select ceil(sum(val(duration1)/60)) from itel WHERE doituong like 'CD ITEL' AND dichvu like 'lientinhde%' AND mangkc in ('FPTHCM','FPTHNI','FPTDNG')
+
+ Đến Thuê bao  tại các tỉnh còn lại:
+select ceil(sum(val(duration1)/60)) from itel WHERE doituong like 'CD ITEL' AND dichvu like 'lientinhde%' AND mangkc NOT in ('FPTHCM','FPTHNI','FPTDNG')
+
+• CD FPT gọi đến CD ITEL
+ Đến Thuê bao ITEL tại HNI, HCM, DNG:
+select ceil(sum(val(duration1)/60)) from itel WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc in ('HCM','HNI','DNG')
+
+ Đến Thuê bao ITEL tại các tỉnh còn lại:
+select ceil(sum(val(duration1)/60)) from itel WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc not in ('HCM','HNI','DNG')
+
+******************************************************************************************************************************************************
+VTN
+
+* Export du lieu ra file txt
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[022023] where (nap like '%VNP%' or nap like '%VTN%' or nap like '%GPC%') and bnum not like '1[89]00%'
+
+* Import du lieu vao foxpro (chinh do dai cac cot, doi gia tri num cua duration)
+
+select * from  vtn where mangkc like 'FPT%'
+copy to chieu_den
+select * from  vtn where doituong like 'CD FPT'
+copy to chieu_di
+
+* cap nhat
+update chieu_den set dichvu='loaiqtve' where dichvu='quocteden' and (right(alltrim(anum),3) ='108' or right(alltrim(anum),4) ='1080' or anum like '01800' or anum like '01900' or anum like '0808%')
+
+* chieu ve
+Select mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong from  chieu_den where dichvu='quocteden' and anum not like '080%' group by mangxp,mangkc,DV ,gc , huong
+copy to FPT400_4
+
+* di dong di/den
+select mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong from  vtn where dichvu='didongden' or dichvu='didongdi' group by mangxp,mangkc,DV ,gc , huong
+copy to FPT400_5
+
+* FPT goi den VNPT
+select mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong from  vtn where dichvu='lientinhden' and mangxp not like 'FPT%' group by mangxp,mangkc,DV ,gc , huong
+copy to FPT400_2
+*
+select mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong from  vtn where dichvu='lientinhdi' and g_k<>'G' group by mangxp,mangkc,DV ,gc , huong 
+copy to FPT400_1
+
+select mangxp,mangkc, 'IDD162' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong from  vtn where dichvu='lientinhdi' and g_k='G' and mangxp like 'FPT%' group by mangxp,mangkc,DV ,gc , huong
+copy to FPT200_2
+
+***(Phan VI, CD FPT di)
+select mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong  from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPT%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTNAN','FPTHPG','FPTBDG','FPTKHA','FPTTHA')   group by mangxp,mangkc,DV ,gc , huong
+copy to FPT400_6 
+
+***(Phan VI, Den CD FPT)
+select mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong  from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPT%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTNAN','FPTHPG','FPTBDG','FPTKHA','FPTTHA')   group by mangxp,mangkc,DV ,gc , huong
+copy to FPT400_7 
+
+***So lieu ITEL_CD FPT den
+SELECT mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong  FROM vtn WHERE mangxp like 'INDOMO%' group by mangxp,mangkc,DV ,gc , huong
+copy to IDT_den_CD_FPT
+
+***So lieu ITEL_CD FPT di
+SELECT mangxp,mangkc, 'PSTN' dv ,0 gc ,ceil(sum(val(duration1))/60) ll,  toll huong  FROM vtn WHERE mangkc like 'INDOMO%' group by mangxp,mangkc,DV ,gc , huong
+copy to CD_FPT_di_IDT
+
+select * from  vtn where dichvu='lientinhdi' and g_k<>'G'
+copy to ct_lientinh
+use ct_lientinh
+ALTER TABLE ct_lientinh ADD COLUMN block_6s num (10)
+ALTER TABLE ct_lientinh ADD COLUMN block_1s num (10)
+close table
+use ct_lientinh
+repl all block_6s with 1 for val(duration1)>0
+repl all block_6s with 0 for val(duration1)<=0
+repl all block_1s with 0 for val(duration1)<=6
+repl all block_1s with val(duration1)-6 for val(duration1)>6
+select mangxp,mangkc, 'PSTN' dv ,0 gc ,sum(block_6s) block_6s,sum(block_1s) block_1s,  toll vtn from  ct_lientinh where dichvu='lientinhdi' and (g_k<>'G' or toll='1') group by mangxp,mangkc,DV ,gc , vtn
+copy to tong_hop_cuoc_dv
+[-----------------------------pause---------------------------]
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp in ('FPTHPG','FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTNAN','FPTBDG','FPTKHA','FPTTHA','TGG')
+copy to FPT406
+***So lieu 400_6 theo tỉnh 
+*HPG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTHPG%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_HPG
+*NAN
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTNAN%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_NAN
+*THA
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTTHA%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA')
+copy to FPT406_THA
+*BDG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTBDG%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTKHA','FPTTHA')
+copy to FPT406_BDG
+*DNI
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTDNI%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_DNI
+*VTU
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTVTU%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_VTU
+*CTO
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTCTO%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_CTO
+*AAG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTAGG%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_AAG
+*KGG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTKGG%' AND mangxp not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_KGG
+*DNG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangxp like 'FPTDNG%' AND mangxp not in ('FPTHNI','FPTHCM','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406_DNG
+
+
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc in ('FPTHPG','FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT406
+**So lieu 400_7 theo tinh
+*HPG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTHPG%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_HPG
+*NAN
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTNAN%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_NAN
+*THA
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTTHA%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA')
+copy to FPT407_THA
+*BDG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTBDG%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTKHA','FPTTHA')
+copy to FPT407_BDG
+*DNI
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTDNI%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_DNI
+*VTU
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTVTU%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_VTU
+*CTO
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTCTO%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTKGG','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_CTO
+*AAG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTAGG%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_AAG
+*KGG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTKGG%' AND mangkc not in ('FPTHNI','FPTHCM','FPTDNG','FPTAGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_KGG
+*DNG
+SELECT anum,bnum,conntime,duration1,mangxp,mangkc from  vtn where dichvu='noihat' and g_k<>'G' AND mangkc like 'FPTDNG%' AND mangkc not in ('FPTHNI','FPTHCM','FPTAGG','FPTKGG','FPTCTO','FPTDNI','FPTVTU','FPTHPG','FPTNAN','FPTBDG','FPTKHA','FPTTHA')
+copy to FPT407_DNG
+
+[------------------------------------------------------------]
+*ket qua len bieu
+
+* bieu FPT_1_400_v4 CD FPT di LT, phan IV
+select mangxp,sum(ll) from FPT400_1 group by mangxp
+
+* bieu FPT_1_400_v4 LT den CD FPT, phan IV
+select mangkc,sum(ll) from FPT400_2 where  left(mangxp,3) not in ('SPT','VPT','VTL','VTC') group by mangkc
+
+* bieu 400 V, phan VI
+select mangxp,sum(ll) from  FPT400_5 group by mangxp
+select mangkc,sum(ll) from  FPT400_5 group by mangkc
+
+* bieu 1_400, phan V
+select * from FPT400_4
+
+* bieu 1_400_v3, phan I
+select mangkc,sum(ll) from FPT200_2 group by mangkc
+
+* bieu 4_400
+select mangxp,sum(block_6s) from tong_hop_cuoc_dv group by mangxp
+select mangxp,sum(block_1s) from tong_hop_cuoc_dv group by mangxp
+!!!!
+* bieu 200 III
+select mangkc,sum(ll),huong from FPT200_7_2 group by mangkc,huong
+
+**** 
+Select anum,bnum,conntime,duration1 from  chieu_den where dichvu='quocteden' and anum not like '080%' and mangkc like '%HCM'
+Select anum,bnum,conntime,duration1 from  chieu_den where dichvu='quocteden' and anum not like '080%' and mangkc like '%HNI'
+
+******************************************************************************************************************************************************
+VNPT
+
+VNPT_den
+
+* Export ra file txt
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[022023] where (nap like '%VNP%' or nap like '%VTN%' or nap like '%GPC%') and (bnum like '18006%' or bnum like '19006%') and mangxp not like 'VMS' and mangxp NOT like 'QTE'
+
+* Xu ly tren foxpro
+close table
+alter table vnpt_den add column duration_1 numb(10)
+close table
+---Kiem tra voi cNguyen ve cong van cua Cuc BDTU ve viec thanh toan cho cac dau so 1800/1900---
+select * from vnpt_den where anum not like '080%'
+(select * from vnpt_den where Ï__anum not like '080%')
+copy to vnpt_den_1
+close table
+use vnpt_den_1
+repl all duration_1 with 0
+repl all duration_1 with val(duration1) for left(bnum,4)='1800'
+repl all duration_1 with val(duration1)-10 for left(bnum,4)='1900' and val(duration1) >=10
+repl all duration_1 with 0 for left(bnum,4)='1900' and val(duration1)<10
+
+* chinh mangxp INDOMOBI thanh IDT_MV
+SELECT * FROM vnpt_den_1 WHERE mangxp like 'INDO%'
+UPDATE vnpt_den_1 SET mangxp ='IDT'  WHERE mangxp like 'INDO%'
+
+select gia,mangxp,'FPT' mangkc,'0' GC,sum(ceil((duration_1)/60)) ll,'1' vtn,'0' tlcg,'0' firstblock, '0' nextblocks, bnum sub_dv,'FPT600' Ma_bieu,right(nap,4) orgtrunk,dai dv  from vnpt_den_1 WHERE doituong <> ' ' group by gia,mangxp,mangkc,gc,vtn,tlcg,firstblock,nextblocks,sub_dv,ma_bieu,nap,dai
+
+copy to ket_qua_den
+---------pause---------
+select doituong,sum(ceil((val(duration1)-10)/60)) from vnpt_den where bnum like '19006%' and (mangxp NOT like 'QTE' and mangxp not like '%QTV%') and val(duration1) >= 10 group by doituong
+close all
+---------------------------------------------------*-----------------------------
+VNPT_DI
+
+* Export ra file txt
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[022023] where (nap like '%VNP%' or nap like '%VTN%' or nap like '%GPC%') and (bnum like '1[89]00[15]%' or bnum like '111')
+
+alter table vnpt_di add column duration_1 numb(10)
+close table
+use VNPT_DI
+repl all duration_1 with 0
+repl all duration_1 with val(duration1) for left(bnum,4)='1800'
+repl all duration_1 with val(duration1) for left(bnum,3)='111'
+repl all duration_1 with val(duration1)-10 for left(bnum,4)='1900' and val(duration1)>=10
+repl all duration_1 with 0 for left(bnum,4)='1900' and val(duration1)<10
+
+* chinh mangxp INDOMOBI thanh IDT_MV
+SELECT * FROM vnpt_di WHERE mangxp like 'INDO%'
+UPDATE vnpt_di SET mangxp ='IDT'  WHERE mangxp like 'INDO%'
+
+select gia,mangxp,'NONAC' mangkc,'0' GC,sum(ceil((duration_1)/60)) ll,'1' vtn,'0' tlcg,'0' firstblock, '0' nextblocks, bnum sub_dv,'FPT600' Ma_bieu, right(nap,4) trmtrunk,dai dv from vnpt_di group by mangxp,mangkc,gc,vtn,tlcg,firstblock,nextblocks,sub_dv,ma_bieu,trmtrunk,dv,gia
+copy to ket_qua_di 
+SELECT * FROM ket_qua_di WHERE sub_dv like '111'
+UPDATE ket_qua_di SET dv = 'DV111' WHERE sub_dv like '111'
+close all
+
+select left(conntime,10) ngay,sum(ceil((val(duration1)-10)/60)) from vnpt_den where bnum like '19006%' and (mangxp NOT like 'QTE' and mangxp not like '%QTV%') and val(duration1) >= 3 group by ngay
+
+# UPDATE ket_qua_den_fpt SET ll=110792 WHERE mangxp like 'GPC' AND gia like '909' AND sub_dv like '19006600' AND orgtrunk like '9'
+
+SELECT SUM(ll) ll FROM ket_qua_den_fpt_1 WHERE gia like '909' AND mangxp like 'GPC'
+
+SELECT * FROM ket_qua_di WHERE gia like '13636' AND sub_dv like '1900%'
+
+SELECT a., b. FROM fpt_hni_2 a left JOIN 401_hni_2 b ON ALLTRIM(a.anum)=ALLTRIM(b.so_cg) and ALLTRIM(a.ngay)=ALLTRIM(b.ngay) and ALLTRIM(left(a.gio,3))=ALLTRIM(left(b.gio,3))
+
+******************************************************************************************************************************************************
+
+HTC
+* Export ra file txt
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%htc%'
+
+* Xu ly tren foxpro
+
+select ceil(sum(val(duration1)/60)) FROM htc WHERE dichvu like 'lientinhde%' AND mangkc in ('FPTHCM','FPTHNI','FPTDNG')
+
+ Đến Thuê bao  tại các tỉnh còn lại:
+select ceil(sum(val(duration1)/60)) from htc WHERE doituong like 'CD HTC' AND dichvu like 'lientinhden' AND mangkc NOT in ('FPTHCM','FPTHNI','FPTDNG')
+
+• CD FPT gọi đến CD HTC
+ Đến Thuê bao CMC tại HNI, HCM, DNG:
+select ceil(sum(val(duration1)/60)) from htc WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc in ('HCM','HNI','DNG')
+
+ Đến Thuê bao CMC tại các tỉnh còn lại:
+select ceil(sum(val(duration1)/60)) from htc WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc not in ('HCM','HNI','DNG')
+
+19006% (CD HTC goi den 19006 cua FPT)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from htc WHERE bnum like '19006%' and val(duration1)>=10 group by gia
+
+18006% (CD HTC goi den 18006 cua FPT)
+select sum(ceil((VAL(duration1))/60)) SL1800 from htc where bnum like '18006%'
+
+19004% (CD HTC goi den 19004 cua FPT)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from htc WHERE bnum like '19004%' and val(duration1)>=10 group by gia
+
+18004% (CD HTC goi den 18004 cua FPT)
+select sum(ceil((VAL(duration1))/60)) SL1800 from htc where bnum like '18004%'
+
+VTC
+* Export ra file txt
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%vtc%'
+
+* Xu ly tren foxpro
+
+• CD VTC gọi đến CD FPT
+ Đến Thuê bao FPT tại các tỉnh :
+select ceil(sum(val(duration1)/60)) FROM vtc WHERE dichvu like 'lientinhde%'
+
+• CD FPT gọi đến CD VTC
+ Đến Thuê bao VTC tại HNI, HCM, DNG:
+select ceil(sum(val(duration1)/60)) from vtc WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' 
+
+19006% (CD VTC goi den 19006 cua FPT)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from vtc WHERE bnum like '19006%' and val(duration1)>=10 group by gia
+
+18006% (CD VTC goi den 18006 cua FPT)
+select sum(ceil((VAL(duration1))/60)) from vtc where bnum like '18006%' and val(duration1)>=3
+
+19003% (CD FPT goi den 19003 cua VTC)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from vtc WHERE bnum like '19003%' and val(duration1)>=10 group by gia
+
+109% (CD FPT goi den 109% cua VTC)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from vtc where (bnum like '024109%' or bnum like '028109%' and bnum like '0236109%') and val(duration1)>=10 group by gia
+
+MBC
+* Export ra file txt
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[022023] where nap like '%gpc%' and (anum like '0559%' or bnum like '0559%')
+
+* Xu ly tren foxpro
+
+• DD MBC gọi đến CD FPT
+ Đến Thuê bao FPT tại các tỉnh :
+select ceil(sum(val(duration1)/60)) FROM mbc WHERE dichvu like 'didongde%' and doituong like 'DD GPC' and anum like '0559%'
+(select ceil(sum(val(duration1)/60)) FROM mbc WHERE dichvu like 'didong%' and doituong like 'DD GPC' and Ï__anum like '0559%')
+• CD FPT gọi đến DD MBC
+ Đến Thuê bao MBC :
+select ceil(sum(val(duration1)/60)) from mbc WHERE doituong like 'CD FPT' and bnum like '0559%'
+
+19006% (DD MBC goi den 19006 cua FPT)
+select gia,sum(ceil((VAL(duration1)-10)/60)) from mbc WHERE anum like '0559%' and bnum like '19006%' and val(duration1)>=10 group by gia
+select gia,sum(ceil((VAL(duration1)-10)/60)) from mbc WHERE Ï__anum like '0559%' and bnum like '19006%' and val(duration1)>=10 group by gia
+
+
+18006% (DD VTC goi den 18006 cua FPT)
+select sum(ceil((VAL(duration1))/60)) from mbc where anum like '0559%' and bnum like '18006%' and val(duration1)>=3
+select sum(ceil((VAL(duration1))/60)) from mbc where Ï__anum like '0559%' and bnum like '18006%' and val(duration1)>=3
+
+
+----------------------------------------------------------------
+DIGITEL
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [022023] where nap like '%digitel%'
+
+Chiều CĐ Digitel đến CĐ FPT (noi hat)
+select ceil(sum(val(duration1)/60)) from digitel WHERE dichvu like 'noihat' AND mangkc like 'FPT%'
+
+Chiều CĐ Digitel đến CĐ FPT có mã vùng (liên tỉnh)
+select ceil(sum(val(duration1)/60)) from digitel WHERE dichvu like 'lientinhden' AND mangkc in ('FPTHCM','FPTHNI','FPTDNG')
+
+Chiều CĐ Digitel đến CĐ FPT không có mã vùng (liên tỉnh)	
+select ceil(sum(val(duration1)/60)) from digitel WHERE dichvu like 'lientinhden' AND mangkc NOT in ('FPTHCM','FPTHNI','FPTDNG')
+
+Chiều CĐ FPT đến CĐ noi hat Digitel
+select ceil(sum(val(duration1)/60)) from digitel WHERE doituong like 'CD FPT' AND dichvu like 'noihat' AND mangkc in ('HCM','HNI','DNG')
+
+Chiều CĐ FPT đến CĐ liên tỉnh Digitel	
+select ceil(sum(val(duration1)/60)) from digitel WHERE doituong like 'CD FPT' AND dichvu like 'lientinhdi' AND mangkc in ('HCM','HNI','DNG')
+
+19006/18006
+select gia,sum(ceil((VAL(duration1)-10)/60)) from digitel WHERE bnum like '19006%' and val(duration1)>=10 AND Dichvu like '1900_FPT' group by gia
+select gia,sum(ceil(VAL(duration1)/60)) from digitel WHERE bnum like '18006%' and val(duration1)>=10 AND Dichvu like '1800_FPT' group by gia
+
+
+
+Xử lý lệch - xuất CSV
+select from anum,bnum,mangxp,mangkc,duration1,conntime FROM mbc where anum like '0559%' and bnum like '18006%' and val(duration1)>=3
+select anum,bnum,mangxp,mangkc,duration1,conntime FROM mbc where anum like '0559%' and bnum like '18006%' and val(duration1)>=3
+COPY TO 18006 TYPE CSV

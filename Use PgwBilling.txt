@@ -1,0 +1,128 @@
+Use PgwBilling
+====================================================================
+CREATE TABLE [032023]
+(
+    id varchar(50),
+    sessionid varchar(50),
+    starttime varchar(50),
+    conntime varchar(50),
+    conntimems varchar(50),
+    endtime varchar(50),
+    endtimems varchar(50),
+    freedtime varchar(50),
+    calling varchar(50),
+    called varchar(50),
+    redirect varchar(50),
+    duration varchar(50),
+    durationms varchar(50),
+    nap varchar(50),
+    direction varchar(50),
+);
+=======================================================================
+BULK INSERT [032023]
+FROM 'D:\DSC\032023\032023.csv'
+======================================================================
+======================================================================
+ALTER TABLE [032023] ADD anum varchar(50);
+ALTER TABLE [032023] ADD bnum varchar(50);
+ALTER TABLE [032023] ADD mangxp varchar(50);
+ALTER TABLE [032023] ADD mangkc varchar(50);
+ALTER TABLE [032023] ADD G_k varchar(50);
+ALTER TABLE [032023] ADD toll varchar(50);
+ALTER TABLE [032023] ADD dichvu varchar(50);
+ALTER TABLE [032023] ADD doituong varchar(50);
+ALTER TABLE [032023] ADD gia varchar(50);
+ALTER TABLE [032023] ADD dai varchar(50);
+ALTER TABLE [032023] ADD duration1 int;
+ALTER TABLE [032023] ADD duration2 int;
+==========================================================================
+EXEC sp_rename 'PgwBilling.dbo.gtgt', 'gtgt.032023';
+=========================================================================
+CREATE TABLE [gtgt]
+(
+    mangdv varchar(50),
+    dauso varchar(50),
+    dodai varchar(50),
+    DDVNP varchar(50),
+    DDVMS varchar(50),
+    DDGTL varchar(50),
+    DDVNM varchar(50),
+    DDVTL varchar(50),
+    CDFPT varchar(50),
+    CDVNP varchar(50),
+    CDSPT varchar(50),
+    CDCMC varchar(50),
+    CDITEL varchar(50),
+    CDVTL varchar(50),
+    CDGTEL varchar(50),
+    CDHTC varchar(50),
+    CDVTC varchar(50),
+    daisovnp varchar(50),
+    daisovtl varchar(50)
+);
+===========================================================================
+BULK INSERT [gtgt]
+FROM 'D:\DSC\gtgt.csv'
+WITH (
+	FIRSTROW = 2,
+    FIELDTERMINATOR = ','
+);
+===========================================================================
+xu ly ss7.txt
+============================================================================
+CTRL + SHIFT + F
+
+108x
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong from [PgwBilling].[dbo].[032023] where (bnum like '1%' or bnum in ('0838258501','0838355555','0838222000','0838164001' , '02838258501','02838355555','02838222000','02838164001') or bnum in ('038258501','038355555','038222000','038164001')or bnum like '8011%' or bnum like '048011%'  or bnum like '0248011%' or bnum like '0288011%' or bnum like '088011%'or bnum like '08011%' or bnum like '028800%' or bnum like '024800%' ) and bnum not like '1[89]00%' and mangxp like 'FPT%' and bnum not like '17%'
+
+CMC
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%CMC%'
+
+DIGITEL
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%DIGITEL%'
+
+GTEL
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[032023] where nap like '%GTL%' and nap not like 'sip_gtl_1988'
+GTEL_CD
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like 'sip_gtl_1988'
+GTEL_DV
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where called like '1[8|9]000%' and nap like 'sip_gtl_1988'
+
+HTC
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%htc%'
+
+ITEL
+select distinct anum,bnum,conntime,duration,duration1,duration2,nap,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%ITEL%' and nap not like '%DIGITEL%'
+
+MBC
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%gpc%' and (anum like '0559%' or bnum like '0559%')
+
+SPT
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%SPT%'
+
+VMS
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%vms%'
+
+VNM.txt
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%VNM%'
+
+VNPT_DEN
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[032023] where (nap like '%VNP%' or nap like '%VTN%' or nap like '%GPC%') and (bnum like '18006%' or bnum like '19006%') and mangxp not like 'VMS' and mangxp NOT like 'QTE'
+VNPT_DI
+select distinct anum,bnum,conntime,duration,duration1,duration2,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[032023] where (nap like '%VNP%' or nap like '%VTN%' or nap like '%GPC%') and (bnum like '1[89]00[15]%' or bnum like '111')
+
+VTC
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%vtc%'
+
+VTL_CD
+select distinct anum,bnum,conntime,duration,duration1,duration2,durationms,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%VTL%' and doituong like '%CD%'
+select distinct anum,bnum,conntime,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%VTL%' and doituong like '%CD%'
+
+VTL_DD
+select distinct anum,bnum,conntime,duration,duration1,duration2,durationms,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%VTL%' and doituong like '%DD%'
+VTL_QT
+select distinct anum,bnum,conntime,duration,duration1,duration2,durationms,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia from [PgwBilling].[dbo].[032023] where nap like '%VTL%' and (mangxp like 'QTE' or mangxp like '%QTV%') AND mangkc NOT like 'DV%' and mangkc like 'FPT%'
+
+VTN
+select distinct anum,bnum,conntime,duration,duration1,mangxp,mangkc,dichvu,g_k,toll,doituong,dai,gia,nap from [PgwBilling].[dbo].[032023] where (nap like '%VNP%' or nap like '%VTN%' or nap like '%GPC%') and bnum not like '1[89]00%'
+
